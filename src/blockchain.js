@@ -88,7 +88,7 @@ class Blockchain {
         }
         throw "La cadena ha sido alterada";
       } catch (error) {
-        reject("Its not possible add new block");
+        reject(error);
       }
     });
   }
