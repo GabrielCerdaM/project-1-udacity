@@ -86,7 +86,7 @@ class Blockchain {
           self.height = self.chain.length - 1;
           resolve(self.chain[self.chain.length - 1]);
         }
-        throw "La cadena ha sido alterada";
+        throw "the chain was altered";
       } catch (error) {
         reject(error);
       }
@@ -142,7 +142,6 @@ class Blockchain {
       try {
         if (currentTime - messageTime < FIVE_MIN) {
           const verified = bitcoinMessage.verify(message, address, signature);
-          console.log("verified", verified);
           if (!verified) {
             throw "The message is not verify, block dont will be added";
           }
@@ -153,7 +152,6 @@ class Blockchain {
           throw "The message require a new sign because the current is more old than 5 minutes";
         }
       } catch (error) {
-        console.log("error", error);
         reject(error);
       }
     });

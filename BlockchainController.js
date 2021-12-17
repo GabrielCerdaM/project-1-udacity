@@ -89,7 +89,6 @@ class BlockchainController {
             signature,
             star
           );
-          console.log("response submitStart", block);
           if (block) {
             return res.status(200).json(block);
           } else {
@@ -126,7 +125,6 @@ class BlockchainController {
     this.app.get("/blocks/:address", async (req, res) => {
       if (req.params.address) {
         const address = req.params.address;
-        console.log("address", address);
         try {
           let stars = await this.blockchain.getStarsByWalletAddress(address);
           if (stars) {
