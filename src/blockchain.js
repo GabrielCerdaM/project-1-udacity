@@ -147,7 +147,7 @@ class Blockchain {
             throw "The message is not verify, block dont will be added";
           }
           const newBlock = new BlockClass.Block({ ...star, owner: address });
-          self._addBlock(newBlock);
+          await self._addBlock(newBlock);
           resolve(self.chain[self.chain.length - 1]);
         } else {
           throw "The message require a new sign because the current is more old than 5 minutes";
