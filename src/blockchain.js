@@ -72,17 +72,15 @@ class Blockchain {
   _addBlock(block) {
     let self = this;
     return new Promise(async (resolve, reject) => {
-      // const previousBlockHash = 0;
       try {
         if (self.chain.length > 0) {
           block.previousBlockHash = self.chain[self.chain.length - 1].hash;
         }
         block.height = (await self.getChainHeight()) + 1;
-        // block.previousBlockHash = previousBlockHash;
         block.time = self._getCurrentTimeStamp();
         block.hash = SHA256(JSON.stringify(block)).toString();
         self.chain.push(block);
-        if (self.validateChain()) {
+        if ((await self.validateChain()) == true) {
           self.height = self.chain.length - 1;
           resolve(self.chain[self.chain.length - 1]);
         }
@@ -137,7 +135,8 @@ class Blockchain {
     return new Promise(async (resolve, reject) => {
       const messageTime = parseInt(message.split(":")[1]);
       const currentTime = parseInt(this._getCurrentTimeStamp());
-      const FIVE_MIN = 5 * 60 * 1000;
+      // five minutes in seconds
+      const FIVE_MIN = 300;
 
       try {
         if (currentTime - messageTime < FIVE_MIN) {
@@ -178,7 +177,7 @@ class Blockchain {
   getBlockByHeight(height) {
     let self = this;
     return new Promise((resolve, reject) => {
-      let block = self.chain.filter((block) => block.height === height)[0];
+      let block = self.chain.find((block) => block.height === height)[0];
       if (block) {
         resolve(block);
       } else {
@@ -217,12 +216,23 @@ class Blockchain {
     let self = this;
     let errorLog = [];
     return new Promise(async (resolve, reject) => {
-      self.chain.forEach((block, index) => {
-        block.validate().catch((error) => {
+      for (let index = 0; index < self.chain.length; index++) {
+        try {
+          const block = self.chain[index];
+          const validated = await block.validate();
+          if (!validated) {
+            throw "The block has been tampered";
+          }
+          if (index > 0) {
+            const previousBlock = self.chain[index - 1];
+            if (block.previousBlockHash != previousBlock.hash) {
+              throw "The block has been tampered";
+            }
+          }
+        } catch (error) {
           errorLog.push({ block: block, error: error });
-        });
-      });
-
+        }
+      }
       if (errorLog.length > 0) {
         reject(errorLog);
       }

@@ -39,10 +39,15 @@ class Block {
     return new Promise((resolve, reject) => {
       // Save in auxiliary variable the current block hash
       const currentBlockHash = self.hash;
+      // why we need asign it to null if later we asign it with the same value? (1)
+      self.hash = null;
       // Recalculate the hash of the Block
-      const hash = SHA256(JSON.stringify(self)).toString();
+      const newHash = SHA256(JSON.stringify(self)).toString();
+      // why we need asign it to null if later we asign it with the same value? (2)
+      self.hash = currentBlockHash;
       // Comparing if the hashes changed
-      if (currentBlockHash != hash) {
+      // I don't see any changes other than setting the hash of the block to null and assigning it back to the old value, what's the explanation? (one)
+      if (currentBlockHash != newHash) {
         // Returning the Block is not valid
         return reject(false);
       }
